@@ -21,7 +21,7 @@ jobs:
         with:
           push: true
           tags: "lirt/k8s-secret-replicator:${{ github.ref_name }}"
-          file: "docker/Dockerfile"
+          file: "Dockerfile"
           platforms: "linux/amd64,linux/arm,linux/arm64"
           no-cache: true
           build-args: |
