@@ -1,0 +1,46 @@
+{{- if .Values.serviceAccount.create -}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "k8s-secret-replicator.serviceAccountName" . }}
+  labels:
+    {{- include "k8s-secret-replicator.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "k8s-secret-replicator.serviceAccountName" . }}
+rules:
+  - apiGroups: [""]
+    resources:
+      - secrets
+    verbs:
+      - get
+      - create
+      - watch
+  - apiGroups: [""]
+    resources:
+      - namespaces
+    verbs:
+      - watch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "k8s-secret-replicator.serviceAccountName" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "k8s-secret-replicator.serviceAccountName" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "k8s-secret-replicator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
