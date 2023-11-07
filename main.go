@@ -58,7 +58,14 @@ func watchSourceSecret(client *kubernetes.Clientset, watchApi watchapi.Interface
 						logger.Info("Skip updating secret in source namespace")
 						continue
 					}
-					helpers.UpdateExistingSecret(client, logger, event.Object.(*v1.Secret), sourceSecretName, ns.Name)
+					err = helpers.UpdateExistingSecret(client, logger, event.Object.(*v1.Secret), sourceSecretName, ns.Name)
+					if err != nil {
+						logger.Error("failed to update secret",
+							zap.String("name", sourceSecretName),
+							zap.String("namespace", ns.Name),
+							zap.Error(err),
+						)
+					}
 				}
 			}
 		}
